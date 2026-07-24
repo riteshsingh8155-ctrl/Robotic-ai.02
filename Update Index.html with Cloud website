@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Robotic AI - Cloud & Research</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', Arial, sans-serif; 
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      color: #e0e0e0; 
+      line-height: 1.8;
+    }
+    header {
+      background: rgba(0, 255, 136, 0.1);
+      padding: 30px;
+      text-align: center;
+      border-bottom: 2px solid #00ff88;
+    }
+    header h1 { color: #00ff88; font-size: 2.5em; }
+    header p { color: #aaa; margin-top: 10px; }
+    
+    .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+    
+    .card { 
+      background: rgba(255,255,255,0.05); 
+      border: 1px solid #00ff88; 
+      padding: 30px; 
+      border-radius: 15px; 
+      margin: 20px 0;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 20px rgba(0,
