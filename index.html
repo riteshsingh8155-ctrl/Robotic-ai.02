@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI Trading Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{background:#0a0a0a;color:#fff;font-family:sans-serif;text-align:center}
+h1{color:#00ff88}
+.card{background:#1a1a1a;margin:15px;padding:15px;border-radius:10px;border:1px solid #00ff88}
+.price{font-size:24px;color:#00ff88}
+.signal{font-size:18px;margin-top:10px}
+.buy{color:#00ff88} .sell{color:#ff4444}
+</style>
+</head>
+<body>
+<h1>🤖 AI Trading Dashboard</h1>
+
+<div class="card">
+<h2>BTC/USDT</h2>
+<div class="price" id="btc">Loading...</div>
+<div class="signal" id="btc-sig">AI: Checking...</div>
+</div>
+
+<div class="card">
+<h2>GOLD</h2>
+<div class="price" id="gold">Loading...</div>
+<div class="signal" id="gold-sig">AI: Checking...</div>
+</div>
+</script>
+<div class="card">
+<h2>SILVER</h2>
+<div class="price" id="silver">Loading...</div>
+<div class="signal" id="silver-sig">AI: Checking...</div>
+</div>
+
+<script>
+async function getPrice(){
+  try{
+    let b =await fetch('https://api.binance.co#m/api/v3/ticker/price?syambol=BTCUSDT').then(r=.json();             
+    document.getElementyBYID('btc').innerText='$'+g,toFixed(2);                                                      
