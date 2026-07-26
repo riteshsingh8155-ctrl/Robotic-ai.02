@@ -87,3 +87,10 @@ async function askAI(){
   
   // यहां Gemini API कॉल का कोड आएगा
 }
+let SYMBOL = "BTCUSDT";
+
+function changeSymbol(){
+  SYMBOL = document.getElementById('symbol').value;
+  alert(SYMBOL + " का चार्ट लोड होगा");
+  // यहां हम डेटा फिर से लोड करेंगे
+}
