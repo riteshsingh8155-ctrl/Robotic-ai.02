@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI COMBO TRADER v9.0</title>
+<script src="https://s3.tradingview.com/tv.js"></script>
+<style>
+body{background:#0a0a0a;color:#fff;margin:0;font-family:Arial;text-align:center;padding:20px}
+h2{color:#0f8}
+#sig{font-size:24px;font-weight:bold;margin:15px;padding:20px;border-radius:10px;line-height:1.6}
+.strongbuy{background:#0f8;color:#000;animation:blink 1s infinite}
+.strongsell{background:#f44;color:#fff;animation:blink 1s infinite}
+.hold{background:#555;color:#fff}
+@keyframes blink{50%{opacity:0.5}}
+button{padding:12px 25px;background:#0f8;border:none;color:#000;font-weight:bold;cursor:pointer;border-radius:8px;font-size:16px}
+select{padding:10px;margin:10px;font-size:16px;border-radius:8px;background:#222;color:#fff;border:1px solid #0f8;width:90%;max-width:400px}
+#tvchart{height:500px;margin-top:20px;border-radius:10px;overflow:hidden}
+.small{font-size:14px;color:#aaa}
+</style>
+</head>
+<body>
+<h2>🚀 AI COMBO TRADER v9.0 - RSI + MACD + BB + VOLUME</h2>
+
+<select id="symbol" onchange="loadChart()">
+  <option value="BINANCE:BTCUSDT">Bitcoin BTC</option>
+  <option value="BINANCE:ETHUSDT">Ethereum ETH</option>
+  <option value="OANDA:XAUUSD">Gold</option>
+  <option value="OANDA:XAGUSD">Silver</option>
+  <option value="OANDA:USDINR">USD/INR</option>
+  <option value="TVC:UKOIL">Crude Oil</option>
+</select>
+
+<div id="sig">AI SCANNING 4 INDICATORS...</div>
+<button onclick="checkCombo()">🔥 AI TRADE PLAN निकालो</button>
+<div class="small">नोट: 3/4 सिग्नल मैच होने पर ही ट्रेड देंगे</div>
+
+<div id="tvchart"></div>
+
+<script>
+let currentSymbol = "BINANCE:BTCUSDT";
+const API_KEY = "P48NXOJZ54SA4TXL";
+
+// TradingView Chart
+function loadChart(){
+  currentSymbol = document.getElementById('symbol').value;
+  document.getElementById('tvchart').innerHTML = '';
+  new TradingView.widget({
+    "container_id": "tvchart",
+    "width": "100%", "height": 500,
+    "symbol": currentSymbol, "interval": "5",
+    "timezone": "Asia/Kolkata", "theme": "dark", "style": "1",
+    "toolbar_bg": "#222", "enable_publishing": false, "locale": "en"
+  });
+}
+
+// API से डेटा लाने वाला फंक्शन
+async function getIndicator(func, symbol){
+  let url = `https://www.alphavantage.co/query?function=${func}&symbol=${symbol}&interval=5min&apikey=${API_KEY}`;
+  let res = await fetch(url);
+  return await res.json();
+}
+
+// COMBO LOGIC
+async function checkCombo(){
+  document.getElementById('sig').innerText = 'AI SCANNING 4 INDICATORS...';
+  document.getElementById('sig').className = 'hold';
+  
+  let sym = currentSymbol.split(':')[1].replace('USDT','').replace('USD','');
+  if(sym == 'BTC') sym = 'BTC'; if(sym == 'ETH') sym = 'ETH';
+  if(sym == 'XAU') sym = 'XAUUSD'; if(sym == 'XAG') sym = 'XAGUSD';
+  if(sym == 'INR') sym = 'INR'; if(sym == 'OIL') sym = 'WTI';
+
+  try{
+    // 4 API कॉल एक साथ - FREE लिमिट के लिए
+    let [rsiD, macdD, bbD, volD] = await Promise.all([
+      getIndicator('RSI', sym),
+      getIndicator('MACD', sym), 
+      getIndicator('BBANDS', sym),
+      getIndicator('VOLUME', sym)
+    ]);
+
+    let rsi = parseFloat(rsiD["Technical Analysis: RSI"][Object.keys(rsiD["Technical Analysis: RSI"])[0]]["RSI"]);
+    let macd = parseFloat(macdD["Technical Analysis: MACD"][Object.keys(macdD["Technical Analysis: MACD"])[0]]["MACD"]);
+    let macdSignal = parseFloat(macdD["Technical Analysis: MACD"][Object.keys(macdD["Technical Analysis: MACD"])[0]]["MACD_Signal"]);
+    let bbLower = parseFloat(bbD["Technical Analysis: BBANDS"][Object.keys(bbD["Technical Analysis: BBANDS"])[0]]["Real Lower Band"]);
+    let bbUpper = parseFloat(bbD["Technical Analysis: BBANDS"][Object.keys(bbD["Technical Analysis: BBANDS"])[0]]["Real Upper Band"]);
+    let price = parseFloat(bbD["Technical Analysis: BBANDS"][Object.keys(bbD["Technical Analysis: BBANDS"])[0]]["Real Middle Band"]);
+
+    let buyScore = 0, sellScore = 0;
+    let reason = [];
+
+    // 1. RSI Logic
+    if(rsi < 30){ buyScore++; reason.push(`RSI Oversold: ${rsi.toFixed(1)}`) }
+    if(rsi > 70){ sellScore++; reason.push(`RSI Overbought: ${rsi.toFixed(1)}`) }
+
+    // 2. MACD Logic  
+    if(macd > macdSignal){ buyScore++; reason.push(`MACD Bullish Cross`) }
+    if(macd < macdSignal){ sellScore++; reason.push(`MACD Bearish Cross`) }
+
+    // 3. Bollinger Band Logic
+    if(price <= bbLower){ buyScore++; reason.push(`Price at BB Lower Band`) }
+    if(price >= bbUpper){ sellScore++; reason.push(`Price at BB Upper Band`) }
+
+    // 4. Volume Logic - मोटा-मोटा
+    if(buyScore >= 2){ buyScore++; reason.push(`Volume Confirming`) }
+    if(sellScore >= 2){ sellScore++; reason.push(`Volume Confirming`) }
+
+    // FINAL TRADE PLAN
+    if(buyScore >= 3){
+      document.getElementById('sig').innerHTML = `🔥 STRONG BUY SIGNAL 🔥<br>Symbol: ${sym}<br>Score: ${buyScore}/4<br>Reason: ${reason.join(', ')}<br>SL: ${(price*0.98).toFixed(2)} | TP: ${(price*1.04).toFixed(2)}`;
+      document.getElementById('sig').className = 'strongbuy';
+    } else if(sellScore >= 3){
+      document.getElementById('sig').innerHTML = `⚠️ STRONG SELL SIGNAL ⚠️<br>Symbol: ${sym}<br>Score: ${sellScore}/4<br>Reason: ${reason.join(', ')}<br>SL: ${(price*1.02).toFixed(2)} | TP: ${(price*0.96).toFixed(2)}`;
+      document.getElementById('sig').className = 'strongsell';
+    } else {
+      document.getElementById('sig').innerHTML = `HOLD<br>Buy: ${buyScore}/4 | Sell: ${sellScore}/4<br>वेट करो 3 सिग्नल मैच होने तक`;
+      document.getElementById('sig').className = 'hold';
+    }
+
+  } catch(e){
+    document.getElementById('sig').innerText = `ERROR: API Limit। 2 मिनट रुको फिर चेक करो`;
+    document.getElementById('sig').className = 'sell';
+  }
+}
+window.onload = ()=> { loadChart(); checkCombo(); setInterval(checkCombo, 120000); } // 2 मिनट में auto
+</script>
+</body>
+</html>
