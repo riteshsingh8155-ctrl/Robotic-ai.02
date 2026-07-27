@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI RALLY DETECTOR - PRO</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- फ्री चार्ट, कोई एड नहीं -->
+<style>
+body{background:#0a0a0a;color:#fff;margin:0;font-family:Arial;text-align:center}
+h2{color:#0f8} 
+canvas{background:#111;margin:10px;border:2px solid #0f8;border-radius:10px}
+#sig{font-size:28px;font-weight:bold;margin:15px;padding:20px;border-radius:10px}
+.rally{background:#ff0;color:#000;animation:blink 1s infinite}
+.buy{background:#0f8;color:#000}.sell{background:#f44;color:#fff}.hold{background:#555;color:#fff}
+@keyframes blink{50%{opacity:0.5}}
+button{padding:12px 25px;background:#0f8;border:none;color:#000;font-weight:bold;cursor:pointer;border-radius:8px;font-size:16px;margin:5px}
+select{padding:10px;margin:10px;font-size:16px;border-radius:8px;background:#222;color:#fff;border:1px solid #0f8;width:90%;max-width:400px}
+</style>
+</head>
+<body>
+<h2>🚀 AI RALLY DETECTOR v6.0 - NO ADS</h2>
+
+<select id="symbol" onchange="changeSymbol()">
+  <optgroup label="INDIAN INDEX">
+    <option value="NIFTY">Nifty 50</option>
+    <option value="SENSEX">Sensex</option>
+    <option value="BANKNIFTY">Bank Nifty</option>
+  </optgroup>
+  <optgroup label="COMMODITY">
+    <option value="GOLD">Gold</option>
+    <option value="SILVER">Silver</option>
+    <option value="COPPER">Copper</option>
+  </optgroup>
+  <optgroup label="STOCKS">
+    <option value="RELIANCE">Reliance</option>
+    <option value="TCS">TCS</option>
+    <option value="HDFCBANK">HDFC Bank</option>
+  </optgroup>
+  <optgroup label="CRYPTO">
+    <option value="BTC">Bitcoin</option>
+  </optgroup>
+</select>
+
+<canvas id="priceChart" height="200"></canvas>
+
+<div>
+<div id="sig">AI SCANNING...</div>
+<button onclick="checkRally()">🔥 विस्फोट चेक करो</button>
+</div>
+
+<script>
+const API_KEY = "P48NXOJZ54SA4TXL";
+let SYMBOL = "NIFTY";
+let chart;
+
+window.onload = function() { 
+  checkRally();
+  setInterval(checkRally, 20000);
+}
+
+async function getData(symbol){
+  // Alpha Vantage में Gold = XAUUSD, Silver = XAGUSD
+  let alphaSymbol = symbol;
+  if(symbol == "GOLD") alphaSymbol = "XAUUSD";
+  if(symbol == "SILVER") alphaSymbol = "XAGUSD";
+  if(symbol == "COPPER") alphaSymbol = "COPPER";
+  if(symbol == "BTC") alphaSymbol = "BTC";
+  
+  let url = `https://www.alphavantage.co/query?function=RSI&symbol=${alphaSymbol}&interval=5min&time_period=14&series_type=close&apikey=${API_KEY}`;
+  let res = await fetch(url);
+  return await res.json();
+}
+
+async function checkRally(){ 
+  document.getElementById('sig').innerText = 'AI SCANNING...';
+  let data = await getData(SYMBOL);
+  let rsiData = data["Technical Analysis: RSI"];
+  let latestTime = Object.keys(rsiData)[0];
+  let rsi = parseFloat(rsiData[latestTime]["RSI"]);
+
+  if(rsi < 30){
+    document.getElementById('sig').innerText = `🔥 RALLY ALERT! ${SYMBOL} BUY NOW | RSI: ${rsi.toFixed(2)}`;
+    document.getElementById('sig').className = 'rally';
+  } else if(rsi > 70){
+    document.getElementById('sig').innerText = `⚠️ OVERBOUGHT! ${SYMBOL} SELL | RSI: ${rsi.toFixed(2)}`;
+    document.getElementById('sig').className = 'sell';
+  } else {
+    document.getElementById('sig').innerText = `HOLD | ${SYMBOL} RSI: ${rsi.toFixed(2)}`;
+    document.getElementById('sig').className = 'hold';
+  }
+}
+
+function changeSymbol(){
+  SYMBOL = document.getElementById('symbol').value;
+}
+</script>
+</body>
+</html>
