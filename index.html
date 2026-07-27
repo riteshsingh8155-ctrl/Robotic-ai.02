@@ -130,3 +130,9 @@ window.onload = ()=> { loadChart(); checkCombo(); setInterval(checkCombo, 120000
     SL: 64950 Loss: $10
     TP: 66346 Profit: $30
     Risk:Reward: 1:3
+<script>
+fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT")
+.then(res=>res.json())
+.then(data=>alert("Binance चल रहा है: " + data.price))
+.catch(e=>alert("Error: " + e))
+</script>
