@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI RALLY DETECTOR PRO</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body{background:#0a0a0a;color:#fff;margin:0;font-family:Arial;text-align:center;padding:20px}
+h2{color:#0f8}
+#sig{font-size:28px;font-weight:bold;margin:15px;padding:20px;border-radius:10px}
+.rally{background:#ff0;color:#000;animation:blink 1s infinite}
+.buy{background:#0f8;color:#000}.sell{background:#f44;color:#fff}.hold{background:#555;color:#fff}
+@keyframes blink{50%{opacity:0.5}}
+button{padding:12px 25px;background:#0f8;border:none;color:#000;font-weight:bold;cursor:pointer;border-radius:8px;font-size:16px;margin:5px}
+select{padding:10px;margin:10px;font-size:16px;border-radius:8px;background:#222;color:#fff;border:1px solid #0f8;width:90%;max-width:400px}
+#chartContainer{background:#111;padding:15px;border-radius:10px;margin-top:20px}
+</style>
+</head>
+<body>
+<h2>🚀 AI RALLY DETECTOR v7.6 - WITH CHART</h2>
+
+<select id="symbol">
+  <optgroup label="CRYPTO">
+    <option value="BTC">Bitcoin BTC</option>
+    <option value="ETH">Ethereum ETH</option>
+    <option value="BNB">BNB</option>
+    <option value="SOL">Solana SOL</option>
+  </optgroup>
+  <optgroup label="COMMODITY">
+    <option value="XAUUSD">Gold</option>
+    <option value="XAGUSD">Silver</option>
+    <option value="WTI">Crude Oil WTI</option>
+  </optgroup>
+  <optgroup label="CURRENCY">
+    <option value="EUR">EUR/USD</option>
+    <option value="GBP">GBP/USD</option>
+    <option value="JPY">USD/JPY</option>
+    <option value="INR">USD/INR</option>
+  </optgroup>
+</select>
+
+<div id="sig">AI SCANNING...</div>
+<button onclick="checkRally()">🔥 विस्फोट चेक करो</button>
+
+<div id="chartContainer">
+  <canvas id="rsiChart"></canvas>
+</div>
+
+<script>
+const API_KEY = "P48NXOJZ54SA4TXL";
+let SYMBOL = "BTC";
+let chart;
+document.getElementById('symbol').onchange = (e)=> { SYMBOL = e.target.value; checkRally(); }
+window.onload = checkRally;
+
+async function checkRally(){
+  document.getElementById('sig').innerText = 'AI SCANNING...';
+  document.getElementById('sig').className = 'hold';
+  
+  let url = `https://www.alphavantage.co/query?function=RSI&symbol=${SYMBOL}&interval=5min&time_period=14&series_type=close&apikey=${API_KEY}`;
+  
+  try{
+    let res = await fetch(url);
+    let data = await res.json();
+    
+    if(data["Note"]) throw new Error("API Limit। 1 मिनट रुको");
+    if(!data["Technical Analysis: RSI"]) throw new Error("डेटा नहीं मिला");
+    
+    let rsiData = data["Technical Analysis: RSI"];
+    let times = Object.keys(rsiData).slice(0,20).reverse();
+    let rsiValues = times.map(t => parseFloat(rsiData[t]["RSI"]));
+    let latestRsi = rsiValues[rsiValues.length-1];
+
+    // Signal
+    if(latestRsi < 30){
+      document.getElementById('sig').innerText = `🔥 RALLY ALERT! ${SYMBOL} BUY NOW | RSI: ${latestRsi.toFixed(2)}`;
+      document.getElementById('sig').className = 'rally';
+    } else if(latestRsi > 70){
+      document.getElementById('sig').innerText = `⚠️ OVERBOUGHT! ${SYMBOL} SELL | RSI: ${latestRsi.toFixed(2)}`;
+      document.getElementById('sig').className = 'sell';
+    } else {
+      document.getElementById('sig').innerText = `HOLD | ${SYMBOL} RSI: ${latestRsi.toFixed(2)}`;
+      document.getElementById('sig').className = 'hold';
+    }
+
+    // Chart
+    if(chart) chart.destroy();
+    const ctx = document.getElementById('rsiChart');
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: times.map(t => t.split(' ')[1]),
+        datasets: [{
+          label: `${SYMBOL} RSI`,
+          data: rsiValues,
+          borderColor: '#0f8',
+          backgroundColor: 'rgba(0,255,136,0.1)',
+          tension: 0.3
+        }]
+      },
+      options: {
+        scales: {
+          y: { min: 0, max: 100, grid: {color: '#333'} },
+          x: { grid: {color: '#333'} }
+        },
+        plugins: { legend: { labels: {color: '#fff'} }
+      }
+    });
+
+  } catch(e){
+    document.getElementById('sig').innerText = `ERROR: ${e.message}`;
+    document.getElementById('sig').className = 'sell';
+  }
+}
+</script>
+</body>
+</html>
