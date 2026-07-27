@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI TRADING DASHBOARD</title>
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+<style>
+body{background:#0a0a0a;color:#fff;margin:0;font-family:Arial;text-align:center}
+h2{color:#0f8} 
+header{display:flex;justify-content:space-around;padding:15px;background:#111;flex-wrap:wrap}
+.price{color:#0f8;font-size:22px;font-weight:bold}
+#tvchart{height:520px;margin:10px;border:1px solid #0f8}
+.card{padding:20px} 
+#sig{font-size:30px;font-weight:bold;margin:10px}
+.buy{color:#0f8}.sell{color:#f44}.hold{color:#ff8}
+button{padding:12px 25px;background:#0f8;border:none;color:#000;font-weight:bold;cursor:pointer;border-radius:8px;font-size:16px;margin:5px}
+select{padding:10px;margin:10px;font-size:16px;border-radius:8px;background:#222;color:#fff;border:1px solid #0f8}
+</style>
+</head>
+<body>
+<header>
+<div class="price">BTC: $<span id="btc">$0</span></div>
+<div class="price">GOLD: $<span id="gold">$0</span></div>
+<div class="price">NIFTY: $<span id="nifty">$0</span></div>
+</header>
+
+<h2>🤖 AI CLOUD TRADING DASHBOARD</h2>
+
+<select id="symbol" onchange="changeSymbol()">
+  <option value="BINANCE:BTCUSDT">Bitcoin</option>
+  <option value="FX:XAUUSD">Gold</option>
+  <option value="FX:XAGUSD">Silver</option>
+  <option value="INDEX:NIFTY50">Nifty 50</option>
+  <option value="FX:USDJPY">USD / JPY</option>
+</select>
+
+<div id="tvchart"></div>
+
+<div class="card">
+<div id="sig">AI SIGNAL: LOADING...</div>
+<button class="buy" onclick="buy()">BUY</button>
+<button class="sell" onclick="sell()">SELL</button>
+<button onclick="getSignal()">AI से पूछो</button>
+</div>
+
+<script>
+let SYMBOL = "BINANCE:BTCUSDT";
+
+// पेज लोड होते ही चार्ट चला दो
+window.onload = function() {
+  loadChart(SYMBOL);
+}
+
+// चार्ट लोड करने का फंक्शन
+function loadChart(symbol){
+  document.getElementById('tvchart').innerHTML = ""; // पुराना चार्ट साफ
+  new TradingView.widget({
+    "width": "100%",
+    "height": 500,
+    "symbol": symbol,
+    "interval": "5",
+    "theme": "dark",
+    "container_id": "tvchart"
+  });
+}
+
+// Dropdown बदलने पर
+function changeSymbol(){
+  SYMBOL = document.getElementById('symbol').value;
+  loadChart(SYMBOL);
+  document.getElementById('sig').innerText = SYMBOL + " चार्ट लोड हुआ";
+}
+
+// BUY / SELL बटन
+function buy(){ 
+  document.getElementById('sig').innerText = SYMBOL + " BUY ORDER PLACED"; 
+  document.getElementById('sig').className = 'buy';
+}
+function sell(){ 
+  document.getElementById('sig').innerText = SYMBOL + " SELL ORDER PLACED"; 
+  document.getElementById('sig').className = 'sell';
+}
+
+// AI Signal बटन
+function getSignal(){ 
+  const signals = ['BUY','SELL','HOLD'];
+  const rand = signals[Math.floor(Math.random()*3)];
+  document.getElementById('sig').innerText = 'AI SIGNAL: ' + rand + " - " + SYMBOL;
+  document.getElementById('sig').className = rand.toLowerCase();
+}
+
+// Price update dummy
+setInterval(()=>{
+  document.getElementById('btc').innerText = (60000+Math.random()*1000).toFixed(2);
+  document.getElementById('gold').innerText = (2300+Math.random()*10).toFixed(2);
+  document.getElementById('nifty').innerText = (25000+Math.random()*100).toFixed(2);
+},3000);
+</script>
+</body>
+</html>
