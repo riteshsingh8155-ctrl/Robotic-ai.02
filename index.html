@@ -30,10 +30,17 @@ function generateSignal(price, rsi, bb, volume) {
     const CHAT_ID = "तुम्हारा_CHAT_ID"
 const TELEGRAM_TOKEN = "8534769215:AAH6WcPo6W9YURbnJmT1AIoApRsYedXgbRk"
 const CHAT_ID = "8872099638"
-const ASSETS = [
-  { name: "BANKNIFTY", symbol: "NSE:BANKNIFTY", tv: "NSE%3ABANKNIFTY" },
-  { name: "BTCUSDT", symbol: "BINANCE:BTCUSDT", tv: "BINANCE%3ABTCUSDT" },
-  { name: "GOLD", symbol: "OANDA:XAUUSD", tv: "OANDA%3AXAUUSD" },
-  { name: "SILVER", symbol: "OANDA:XAGUSD", tv: "OANDA%3AXAGUSD" },
-  { name: "CRUDE", symbol: "OANDA:WTICOUSD", tv: "OANDA%3AWTICOUSD" }
+const const ASSETS = [
+  { name: "BANKNIFTY", tv: "NSE%3ABANKNIFTY" },
+  { name: "BTCUSDT", tv: "BINANCE%3ABTCUSDT" },
+  { name: "GOLD", tv: "OANDA%3AXAUUSD" },
+  { name: "SILVER", tv: "OANDA%3AXAGUSD" },
+  { name: "CRUDE", tv: "OANDA%3AWTICOUSD" },
+  { name: "NIFTY", tv: "NSE%3ANIFTY" }
 ]
+
+function sendSignal(asset, signal, score, status, entry, sl, tp) {
+  ...
+}
+  ...
+}
