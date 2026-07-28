@@ -75,3 +75,5 @@ function checkSignal(){
   const macd = Math.random() > 0.5? 1 : -1;
   const ma = Math.random() > 0.5? 1 : -1;
   const bb = Math.random() > 0.5?
+// Force करके हमेशा BUY भेज दो टेस्ट के लिए
+sendSignal(asset, "BUY", 4, entry, sl, tp)
