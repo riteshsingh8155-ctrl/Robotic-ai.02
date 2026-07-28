@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head><title>AI BankNifty v10.2 - HOLD के साथ</title></head>
+<body>
+<h2>AI सिग्नल: <span id="signal">WAIT</span></h2>
+<p>AI Score: <span id="score">0/4</span></p>
+<p>स्टेटस: <span id="status">HOLD करो अभी</span></p>
+
+<script>
+// पुराना लॉजिक + HOLD वाला स्टेटस वापस
+function generateSignal(price, rsi, bb, volume) {
+    let buyScore = 0, sellScore = 0;
+    
+    if(rsi > 60 && price > bb.upper) buyScore++;
+    if(volume > avgVolume*1.5) buyScore++;
+    // ... 4 कंडीशन
+    
+    if(buyScore >= 3 && sellScore < 2) return {signal: "BUY", score: buyScore, status: "STRONG BUY - एंट्री लो"};
+    if(sellScore >= 3 && buyScore < 2) return {signal: "SELL", score: sellScore, status: "STRONG SELL - शॉर्ट करो"};
+    if(buyScore == 2 && sellScore == 2) return {signal: "WAIT", score: 2, status: "HOLD करो - रेंज में है मार्केट"};
+    
+    return {signal: "WAIT", score: Math.max(buyScore,sellScore), status: "HOLD करो - कन्फर्मेशन का वेट"};
+}
+
+// हर 1 मिनट में अपडेट और Telegram पर भेजेगा
+</script>
+</body>
+</html>
