@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Signal Bot</title>
+</head>
+<body>
+  <h1>🤖 AI Signal Bot Running...</h1>
+  <p>Telegram पर सिग्नल आएगा। पेज बंद मत करना।</p>
+
+<script>
+// ===== 1. अपनी डिटेल यहाँ डालो =====
+const TELEGRAM_TOKEN = "8534769215:AAH6WcPo6W9YURbnJmT1AIoApRsYedXgbRk"
+const CHAT_ID = "8872099638"
+
+// ===== 2. Assets List =====
+const ASSETS = [
+  { name: "BANKNIFTY", tv: "NSE%3ABANKNIFTY" },
+  { name: "NIFTY", tv: "NSE%3ANIFTY" },
+  { name: "BTCUSDT", tv: "BINANCE%3ABTCUSDT" },
+  { name: "GOLD", tv: "OANDA%3AXAUUSD" },
+  { name: "SILVER", tv: "OANDA%3AXAGUSD" },
+  { name: "CRUDE", tv: "OANDA%3AWTICOUSD" }
+]
+
+// ===== 3. Telegram पर सिग्नल भेजने का Function =====
+function sendSignal(asset, signal, score, status, entry, sl, tp) {
+  const emoji = signal === "BUY" ? "🟢" : signal === "SELL" ? "🔴" : "🟡"
+  
+  const message = `
+${emoji} 💥 AI सिग्नल: ${asset.name}
+सिग्नल: ${signal}
+Score: ${score}/4
+स्टेटस: ${status}
+
+Entry: ${entry}
+SL: ${sl}
+Target: ${tp}
+
+📊 Live Chart: https://www.tradingview.com/chart/?symbol=${asset.tv}
+`
+  fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}&parse_mode=HTML`)
+ .then(res => res.json())
+ .then(data => console.log("Sent:", data))
+ .catch(err => console.error("Error:", err))
+}
+
+// ===== 4. TEST - पेज खुलते ही 1 डेमो सिग्नल भेजेगा =====
+setTimeout(() => {
+  sendSignal(AS
