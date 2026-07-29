@@ -28,3 +28,8 @@ loadChart("NSE:NIFTY 50");
 
 </body>
 </html>
+<select id="symbol">
+  <option value="99926000">NIFTY 50</option>  <!-- Angel ka token -->
+  <option value="99926009">BANKNIFTY</option> <!-- Angel ka token -->
+  <option value="3045">RELIANCE</option>      <!-- Angel ka token -->
+</select>
