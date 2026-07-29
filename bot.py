@@ -121,3 +121,4 @@ while True:
         print("Loop Error:", e)
         time.sleep(60)
     pip install smartapi-python pyotp pandas TA-Lib requests
+    python bot_pro.py
