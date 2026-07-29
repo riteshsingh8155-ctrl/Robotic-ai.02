@@ -18,3 +18,7 @@ def get_ltp(obj, symboltoken):
         return ltp_data['data']['ltp']
     except:
         return 0
+<select id="symbol">
+  <option value="AAPL">NIFTY</option>  <!-- YE GALAT HAI -->
+  <option value="TSLA">BANKNIFTY</option>
+</select>
