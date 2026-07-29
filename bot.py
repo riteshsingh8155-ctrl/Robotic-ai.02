@@ -122,3 +122,12 @@ while True:
         time.sleep(60)
     pip install smartapi-python pyotp pandas TA-Lib requests
     python bot_pro.py
+🚨 AI MTF SIGNAL 🚨
+
+BUY
+Symbol: NIFTY
+Entry TF: 1 Minute  
+Price: 25123.50
+
+Trend: 1H+30+15 ✅
+Delta: BULLISH_DELTA ✅
