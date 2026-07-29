@@ -1,4 +1,4 @@
-⁸import time
+o⁸import time
 import pandas as pd
 import talib
 from smartapi import SmartConnect
@@ -88,3 +88,9 @@ PASSWORD = "TUMHARA_PASSWORD"
 TOTP_SECRET = "TUMHARA_TOTP"
 TELEGRAM_BOT_TOKEN = "TUMHARA_TOKEN"
 TELEGRAM_CHAT_ID = "TUMHARA_CHAT_ID"
+def get_ltp(obj, symboltoken): 
+    try: 
+        ltp_data = obj.ltpData(exchange="NSE", tradingsymbol="NIFTY 50", symboltoken="99926000") 
+        return ltp_data['data']['ltp'] 
+    except: 
+        return 0
