@@ -194,3 +194,87 @@ def main():
         hottest_sector = "BANK" # Logic se nikalega
         find_smart_money_stock(smart, hottest_sector, SECTORS[hottest_sector])
         time.sleep(300) # 5 min me 1 baar check
+import pyotp, time, requests
+from smartapi import SmartConnect
+from datetime import datetime
+
+# ======= APNE DETAILS DAALO =======
+API_KEY = "dOgfiXS0"
+CLIENT_CODE = "R1001550"
+PASSWORD = "2002"
+TOTP_SECRET = "TUMHARA_NAYA_TOTP_SECRET"
+TELEGRAM_BOT_TOKEN = "8534769215:AAGSTXW_0gztZk9qcSoTCiQa819YWoiXVX8"
+TELEGRAM_CHAT_ID = "8872099638"
+# ========================================
+
+# SECTOR LIST - F&O stocks hi daalo jisme OI milega
+SECTORS = {
+    "BANK": ["HDFCBANK", "ICIBANK", "SBIN", "KOTAKBANK", "AXISBANK", "BANKNIFTY"],
+    "IT": ["TCS", "INFY", "WIPRO", "HCLTECH", "TECHM", "NIFTYIT"],
+    "AUTO": ["MARUTI", "TATAMOTORS", "M&M", "BAJAJ-AUTO", "HEROMOTOCO"]
+}
+
+def send_telegram(msg):
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    requests.post(url, data={"chat_id": TELEGRAM_CHAT_ID, "text": msg})
+
+def login_angel():
+    smartApi = SmartConnect(api_key=API_KEY)
+    totp = pyotp.TOTP(TOTP_SECRET).now()
+    data = smartApi.generateSession(CLIENT_CODE, PASSWORD, totp)
+    if data['status']: 
+        send_telegram("✅ Bot Started + Login Success")
+        return smartApi
+    else: 
+        send_telegram("❌ Login Failed")
+        return None
+
+def get_oi_data(smart, symbol):
+    # F&O ka OI nikalne ke liye
+    try:
+        data = smart.getOptionChain(symbol=symbol, strikePrice=0, expiryDate="")
+        # Yahan ATM call+put ka OI total kar sakte ho
+        # Simple ke liye hum ltp + volume + change le rahe
+        ltp = smart.ltpData(exchange="NSE", tradingsymbol=symbol, symboltoken="")
+        return ltp['data']
+    except:
+        return None
+
+def main():
+    smart = login_angel()
+    if not smart: return
+
+    while True:
+        try:
+            # 1. Sabse tez sector dhoondo
+            for sector, stocks in SECTORS.items():
+                sector_change = 0
+                for s in stocks:
+                    d = get_oi_data(smart, s)
+                    if d: sector_change += d['change']
+                sector_change = sector_change / len(stocks)
+
+                # 2. Agar sector 1.5% se zyada hila to usme stock dhoondo
+                if abs(sector_change) > 1.5:
+                    for stock in stocks:
+                        d = get_oi_data(smart, stock)
+                        if d and d['volume'] > 500000: # Volume filter
+                            # 3. Yahan OI logic - Angel se direct OI nahi aata to hum volume + price se smart money pakadte
+                            if d['change'] > 2 and sector_change > 0: # Upar wala sector
+                                msg = f"""🚨 SMART MONEY BUY
+Sector: {sector} +{round(sector_change,2)}%
+Stock: {stock}
+Price: {d['ltp']}
+Change: +{d['change']}%
+Volume: {d['volume']}
+Note: OI spike check karne ke liye Angel App me iska F&O dekho
+Time: {datetime.now().strftime('%H:%M:%S')}"""
+                                send_telegram(msg)
+            
+            time.sleep(300) # 5 min baad dubara check
+        except Exception as e:
+            send_telegram(f"Error: {e}")
+            time.sleep(60)
+
+if __name__ == "__main__":
+    main()
