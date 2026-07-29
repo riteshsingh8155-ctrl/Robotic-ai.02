@@ -79,3 +79,95 @@ new TradingView.widget({
   "container_id": "tradingview_chart"
 });
 </script>
+import time
+import pandas as pd
+import talib
+from smartapi import SmartConnect
+import pyotp
+import requests
+from datetime import datetime, timedelta
+
+# ========== SETTINGS ==========
+API_KEY = "TUMHARA_API_KEY"
+CLIENT_CODE = "TUMHARA_CLIENT_CODE"
+PASSWORD = "TUMHARA_PASSWORD"
+TOTP_SECRET = "TUMHARA_TOTP_SECRET"
+
+TELEGRAM_BOT_TOKEN = "APNA_BOT_TOKEN"
+TELEGRAM_CHAT_ID = "APNA_CHAT_ID"
+
+SYMBOLTOKEN = "26000" # NIFTY
+SYMBOL = "NIFTY"
+# ==============================
+
+smartApi = None
+last_signal = "WAIT"
+
+def login():
+    global smartApi
+    totp = pyotp.TOTP(TOTP_SECRET).now()
+    smartApi = SmartConnect(api_key=API_KEY)
+    smartApi.generateSession(CLIENT_CODE, PASSWORD, totp)
+    print("Angel Login Success")
+
+def get_data(tf, days):
+    params = {
+        "exchange": "NSE", "symboltoken": SYMBOLTOKEN,
+        "interval": tf, # "ONE_HOUR", "THIRTY_MINUTE", "FIFTEEN_MINUTE", "ONE_MINUTE"
+        "fromdate": (datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d %H:%M'),
+        "todate": datetime.now().strftime('%Y-%m-%d %H:%M')
+    }
+    res = smartApi.getCandleData(params)
+    df = pd.DataFrame(res['data'], columns=['dt','open','high','low','close','volume'])
+    df[['open','high','low','close','volume']] = df[['open','high','low','close','volume']].astype(float)
+    return df
+
+def check_indicators(df):
+    c = df['close']
+    rsi = talib.RSI(c,14).iloc[-1]
+    ema9 = talib.EMA(c,9).iloc[-1]
+    ema21 = talib.EMA(c,21).iloc[-1]
+    macd, macdsignal, _ = talib.MACD(c)
+    macd = macd.iloc[-1]; macdsignal = macdsignal.iloc[-1]
+    upper, _, lower = talib.BBANDS(c,20)
+    upper = upper.iloc[-1]; lower = lower.iloc[-1]
+    price = c.iloc[-1]
+    
+    buy = rsi>40 and ema9>ema21 and macd>macdsignal and price>lower
+    sell = rsi<60 and ema9<ema21 and macd<macdsignal and price<upper
+    return buy, sell
+
+def send_telegram(msg):
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    requests.post(url, data={"chat_id": TELEGRAM_CHAT_ID, "text": msg})
+
+login()
+while True:
+    # 1. BADA TF CHECK - 1H aur 30min
+    df_1h = get_data("ONE_HOUR", 10)
+    df_30 = get_data("THIRTY_MINUTE", 5)
+    buy_1h, sell_1h = check_indicators(df_1h)
+    buy_30, sell_30 = check_indicators(df_30)
+
+    # 2. SIGNAL TF CHECK - 15min
+    df_15 = get_data("FIFTEEN_MINUTE", 3)
+    buy_15, sell_15 = check_indicators(df_15)
+
+    # 3. ENTRY TF - 1min me final trigger
+    df_1 = get_data("ONE_MINUTE", 1)
+    buy_1, sell_1 = check_indicators(df_1)
+    
+    final_signal = "WAIT"
+    if buy_1h and buy_30 and buy_15 and buy_1:
+        final_signal = "BUY"
+    if sell_1h and sell_30 and sell_15 and sell_1:
+        final_signal = "SELL"
+    
+    if final_signal!= "WAIT" and final_signal!= last_signal:
+        price = df_1['close'].iloc[-1]
+        msg = f"<b>🚨 MTF AI SIGNAL 🚨</b>\n\n<b>{final_signal}</b>\nSymbol: {SYMBOL}\nEntry TF: 1min\nPrice: {price}\n\nTrend: 1H+30min+15min Confirmed"
+        send_telegram(msg)
+        print(f"{datetime.now()} - {final_signal} at {price}")
+        last_signal = final_signal
+
+    time.sleep(30) # har 30 sec me 1min check karega
