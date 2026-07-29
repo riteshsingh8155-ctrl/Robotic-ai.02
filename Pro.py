@@ -1,4 +1,4 @@
-o⁸import time
+9o⁸import time
 import pandas as pd
 import talib
 from smartapi import SmartConnect
@@ -94,3 +94,52 @@ def get_ltp(obj, symboltoken):
         return ltp_data['data']['ltp'] 
     except: 
         return 0
+import pyotp
+import time
+from smartapi import SmartConnect
+import requests
+
+# ======= APNE DETAILS YAHAN DAALO =======
+API_KEY = "dOgfiXS0"
+CLIENT_CODE = "R1001550"
+PASSWORD = "2002"  # Tumhara naya password
+TOTP_SECRET = "TUMHARA_NAYA_TOTP_SECRET"  # Angel se mila hua
+TELEGRAM_BOT_TOKEN = "8534769215:AAGSTXW_0gztZk9qcSoTCiQa819YWoiXVX8"  # BotFather se naya
+TELEGRAM_CHAT_ID = "8872099638"
+# ========================================
+
+def send_telegram(msg):
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    data = {"chat_id": TELEGRAM_CHAT_ID, "text": msg}
+    requests.post(url, data=data)
+
+def login_angel():
+    smartApi = SmartConnect(api_key=API_KEY)
+    totp = pyotp.TOTP(TOTP_SECRET).now()
+    data = smartApi.generateSession(CLIENT_CODE, PASSWORD, totp)
+    
+    if data['status']:
+        send_telegram("✅ Angel Login Success")
+        return smartApi
+    else:
+        send_telegram("❌ Angel Login Failed: " + str(data['message']))
+        return None
+
+def main():
+    send_telegram("🚀 Pro.py Bot Started")
+    smart = login_angel()
+    
+    if smart:
+        # Yahan apna trading logic likhna
+        # Example: har 60 sec me balance check
+        while True:
+            try:
+                balance = smart.rmsLimit()
+                send_telegram(f"Balance: {balance}")
+                time.sleep(60)
+            except Exception as e:
+                send_telegram(f"Error: {e}")
+                time.sleep(60)
+
+if __name__ == "__main__":
+    main()
