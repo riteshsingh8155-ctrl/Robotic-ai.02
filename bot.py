@@ -120,3 +120,4 @@ while True:
     except Exception as e:
         print("Loop Error:", e)
         time.sleep(60)
+    pip install smartapi-python pyotp pandas TA-Lib requests
