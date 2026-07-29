@@ -59,3 +59,23 @@ def main():
 
 if __name__ == "__main__":
     main()
+<script type="text/javascript">
+new TradingView.widget({
+  "width": "100%",
+  "height": 610,
+  "symbol": "NSE:NIFTY",
+  "interval": "15", // 15 minute set
+  "timezone": "Asia/Kolkata",
+  "theme": "dark",
+  "style": "1",
+  "locale": "in",
+  "toolbar_bg": "#1a1a1a",
+  "studies": [ // Yaha indicator add hue
+        "RSI@tv-basicstudies",
+        "MASimple@tv-basicstudies",
+        "MACD@tv-basicstudies",
+        "BB@tv-basicstudies"
+  ],
+  "container_id": "tradingview_chart"
+});
+</script>
