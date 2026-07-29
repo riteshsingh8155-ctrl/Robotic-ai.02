@@ -145,3 +145,52 @@ if __name__ == "__main__":
     main()
 INDEX:NSEI
 INDEX:NSEBANK
+import requests
+from datetime import datetime
+
+SECTORS = {
+    "BANK": ["HDFCBANK", "ICIBANK", "SBIN", "KOTAKBANK", "AXISBANK"],
+    "IT": ["TCS", "INFY", "WIPRO", "HCLTECH", "TECHM"],
+    "AUTO": ["MARUTI", "TATAMOTORS", "M&M", "BAJAJ-AUTO", "HEROMOTOCO"]
+}
+
+def get_sector_change(smart, sector_stocks):
+    # Sector ka avg change nikalega
+    total_change = 0
+    for stock in sector_stocks:
+        data = smart.ltpData(exchange="NSE", tradingsymbol=stock, symboltoken="")
+        total_change += data['data']['change']
+    return total_change / len(sector_stocks)
+
+def find_smart_money_stock(smart, sector_name, sector_stocks):
+    for stock in sector_stocks:
+        try:
+            ltp_data = smart.ltpData(exchange="NSE", tradingsymbol=stock, symboltoken="")
+            ohlc = smart.getCandleData(...) # Yahan OI + Volume nikalna padega
+            
+            price_change = ltp_data['data']['change']
+            volume = ltp_data['data']['volume']
+            oi_change = 15 # Yahan Angel se OI % laana padega
+            
+            # CONDITION: OI badi + Price badi + Volume zyada
+            if oi_change > 10 and price_change > 1.5 and volume > 1000000:
+                msg = f"""🚨 SMART MONEY SIGNAL
+Sector: {sector_name} 🔥
+Stock: {stock}
+Price: {ltp_data['data']['ltp']}
+Price Change: {price_change}%
+OI Change: +{oi_change}%
+Volume: {volume}
+Reason: Sector Top + OI Spike + Volume Spike
+Time: {datetime.now().strftime('%H:%M:%S')}"""
+                send_telegram(msg)
+        except:
+            pass
+
+def main():
+    smart = login_angel()
+    while True:
+        # 1. Sabse garm/thanda sector dhoondo
+        hottest_sector = "BANK" # Logic se nikalega
+        find_smart_money_stock(smart, hottest_sector, SECTORS[hottest_sector])
+        time.sleep(300) # 5 min me 1 baar check
