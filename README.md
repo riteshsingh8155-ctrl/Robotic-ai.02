@@ -27,3 +27,4 @@ def get_ltp(obj, symboltoken):
   <option value="99926009">BANKNIFTY</option> <!-- Angel ka token -->
   <option value="3045">RELIANCE</option>      <!-- Angel ka token -->
 </select>
+symbol: 'NSE:NIFTY 50'  // Angel nahi, TradingView ka NIFTY
