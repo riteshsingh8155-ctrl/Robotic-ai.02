@@ -1,4 +1,4 @@
-import time
+⁸import time
 import pandas as pd
 import talib
 from smartapi import SmartConnect
@@ -81,3 +81,5 @@ while True:
         msg = f"🚨 AI SIGNAL 🚨\n{signal}\nNIFTY @ {df_1['close'].iloc[-1]}\nTF: 1min Entry | Delta: {delta}"
         send(msg); print(f"{datetime.now()} - {signal}"); last_signal = signal
     time.sleep(30)
+    pip install smartapi-python pyotp pandas TA-Lib requests
+    python Pro.py
