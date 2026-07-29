@@ -83,3 +83,8 @@ while True:
     time.sleep(30)
     pip install smartapi-python pyotp pandas TA-Lib requests
     python Pro.py
+CLIENT_CODE = "TUMHARA_ANGEL_ID"
+PASSWORD = "TUMHARA_PASSWORD" 
+TOTP_SECRET = "TUMHARA_TOTP"
+TELEGRAM_BOT_TOKEN = "TUMHARA_TOKEN"
+TELEGRAM_CHAT_ID = "TUMHARA_CHAT_ID"
