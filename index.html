@@ -200,24 +200,7 @@ def main():
         
         # TEMP: Yaha live LTP lana padega. Abhi demo
         ltp = 22000 
-        
-        # 9:15 to 9:20 range banao
-        if now < ENTRY_TIME:
-            if ltp > high_915_920: high_915_920 = ltp
-            if ltp < low_915_920: low_915_920 = ltp
-        
-        # Entry time ke baad check karo
-        if now >= ENTRY_TIME and not trade_done:
-            signal = check_setup(ltp, high_915_920, low_915_920)
-            if signal != "NO_TRADE":
-                place_order(obj, SYMBOL, signal, LOT_SIZE)
-                trade_done = True
-                logger.info(f"Trade Taken: {signal}")
-        
-        time.sleep(5)
-
-if __name__ == "__main__":
-    main()
+    
 symbol: 'NSE:NIFTY 50'  // Angel nahi, TradingView ka NIFTY
 <select id="symbol" style="padding:10px; border-radius:5px; background:#00FF7F; border:none;">
   <option value="NSE:NIFTY 50">NIFTY 50</option>
