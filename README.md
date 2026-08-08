@@ -23,20 +23,17 @@ df_5m = make_ohlcv(500, "5min", trend=0.0015)
 df_1m = make_ohlcv(500, "1min", trend=0.0015)
 
 sig = analyze(df_4h, df_1h, df_15m, df_5m, df_1m)
-print_report(sig)
-# Robotic-ai.02
+print_report(sig).                      # Robotic-ai.02
 
-Ye Angel One + SMC/ICT Trading Bot hai jo Telegram par signal bhejta hai.
+Angel One + SMC/ICT Trading Bot jo Telegram par signal bhejta hai.
 
-## Kaise Chalaye
-1. `pip install numpy pandas requests`
-2. `Main.py` me `TELEGRAM_TOKEN` aur `Angel One API` key dalo
-3. `python Main.py` run karo
+## Setup
+1. `pip install numpy pandas requests smartapi-python`
+2. `Main.py` me apna `API_KEY` aur `TELEGRAM_TOKEN` dalo
+3. Run: `python Main.py`
 
-## Features
-- SMC/ICT Analysis 4h, 1h, 15m, 5m, 1m
-- Telegram Alert
-- Angel One API Integration
+## Files
+- `Main.py` = Bot ka main code
+- `README.md` = Ye instructions file
 
-## Link
-GitHub: https://github.com/riteshsingh8155-ctrl/Robotic-ai.02
+Repo: https://github.com/riteshsingh8155-ctrl/Robotic-ai.02
