@@ -127,3 +127,19 @@ jobs:
       - name: Deploy to Pages
         id: deployment
         uses: actions/deploy-pages@v5
+# Robotic-ai.02
+
+Ye Angel One + SMC/ICT Trading Bot hai jo Telegram par signal bhejta hai.
+
+## Kaise Chalaye
+1. `pip install numpy pandas requests`
+2. `Main.py` me `TELEGRAM_TOKEN` aur `Angel One API` key dalo
+3. `python Main.py` run karo
+
+## Features
+- SMC/ICT Analysis 4h, 1h, 15m, 5m, 1m
+- Telegram Alert
+- Angel One API Integration
+
+## Link
+GitHub: https://github.com/riteshsingh8155-ctrl/Robotic-ai.02
