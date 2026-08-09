@@ -2,3 +2,4 @@ smartapi-python
 pyotp
 python-telegram-bot
 requests
+   smartapi-python
