@@ -26,7 +26,7 @@ jobs:
         env:
           API_KEY: ${{ secrets.API_KEY }}
           CLIENT_CODE: ${{ secrets.CLIENT_CODE }}
-          ANGLE_PASSWORD: ${{ secrets.ANGLE_PASSWORD }}
+          ANGEL_PASSWORD: ${{ secrets.ANGEL_PASSWORD }}
           TOTP_SECRET: ${{ secrets.TOTP_SECRET }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
