@@ -29,3 +29,5 @@ try:
 except Exception as e:
     send_telegram("⚠️ Error: " + str(e))
     print("Error:", e)
+import smartapi
+print(smartapi.__version__)
