@@ -29,3 +29,4 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python Main.py
+BOT_TOKEN = "8534769215:AAFRW6Nhdv1Tti04ODarPZSb2QdFEq9uRHI"
