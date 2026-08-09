@@ -31,3 +31,7 @@ jobs:
         run: python Main.py
          import os
           BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+on:
+  schedule:
+    - cron: '45 3 * 1-5'  # Mon-Fri 9:15 AM IST
+  workflow_dispatch:
