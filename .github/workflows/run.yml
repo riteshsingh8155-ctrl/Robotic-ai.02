@@ -1,0 +1,66 @@
+//@version=5
+strategy("MA + ICT IFVG Strategy - Clean", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=2)
+
+// ========== INPUTS ==========
+ma9_len    = input.int(9, "9 EMA")
+ma20_len   = input.int(20, "20 EMA")
+ma50_len   = input.int(50, "50 EMA")
+ma200_len  = input.int(200, "200 EMA")
+fvg_size   = input.float(0.1, "Min FVG Size %", step=0.01)
+risk_rr    = input.float(2.0, "Risk Reward", step=0.1)
+max_trades = input.int(2, "Max Trades Per Day")
+
+// ========== MOVING AVERAGES ==========
+ma9   = ta.ema(close, ma9_len)
+ma20  = ta.ema(close, ma20_len)
+ma50  = ta.ema(close, ma50_len)
+ma200 = ta.ema(close, ma200_len)
+
+plot(ma9, "9 EMA", color=color.yellow, linewidth=2)
+plot(ma20, "20 EMA", color=color.orange, linewidth=2)
+plot(ma50, "50 EMA", color=color.blue, linewidth=2)
+plot(ma200, "200 EMA", color=color.red, linewidth=3)
+
+// ========== ICT IFVG DIRECT LOGIC ==========
+bull_fvg_valid = (low[2] > high) and (((low[2] - high) / close) * 100 >= fvg_size)
+bear_fvg_valid = (high[2] < low) and (((low - high[2]) / close) * 100 >= fvg_size)
+
+// Direct price intersection without heavy array loops
+price_in_bull_fvg = bull_fvg_valid and (close >= high and close <= low[2])
+price_in_bear_fvg = bear_fvg_valid and (close >= low and close <= high[2])
+
+// ========== TREND FILTER ==========
+long_trend  = ma9 > ma20 and ma20 > ma50 and ma50 > ma200 and close > ma200
+short_trend = ma9 < ma20 and ma20 < ma50 and ma50 < ma200 and close < ma200
+
+// ========== MAX TRADES LIMIT ==========
+var int trades_today = 0
+if ta.change(time("D"))
+    trades_today := 0
+
+can_trade = trades_today < max_trades
+
+// ========== ENTRY CONDITIONS ==========
+long_condition  = long_trend and price_in_bull_fvg and can_trade and strategy.position_size <= 0
+short_condition = short_trend and price_in_bear_fvg and can_trade and strategy.position_size >= 0
+
+// ========== RISK MANAGEMENT (ATR) ==========
+atr = ta.atr(14)
+sl_long = low - atr * 0.5
+tp_long = close + (close - sl_long) * risk_rr
+
+sl_short = high + atr * 0.5
+tp_short = close - (sl_short - close) * risk_rr
+
+// ========== EXECUTION ==========
+if long_condition
+    strategy.entry("Long", strategy.long)
+    strategy.exit("Long Exit", "Long", stop=sl_long, limit=tp_long)
+    trades_today += 1
+    label.new(bar_index, low, "LONG", style=label.style_label_up, color=color.green, textcolor=color.white)
+
+if short_condition
+    strategy.entry("Short", strategy.short)
+    strategy.exit("Short Exit", "Short", stop=sl_short, limit=tp_short)
+    trades_today += 1
+    label.new(bar_index, high, "SHORT", style=label.style_label_down, color=color.red, textcolor=color.white)
